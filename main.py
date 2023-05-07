@@ -1,1 +1,3 @@
-print("Hello Connect4")
+from src.gui.MainMenu import MainMenu
+
+startGUI = MainMenu()
