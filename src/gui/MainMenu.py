@@ -1,6 +1,8 @@
+import tkinter
 from tkinter import *
 from PIL import ImageTk, Image
 import os.path
+from src.gui.BoardGUI import BoardGUI
 
 class MainMenu:
     mode="Human_Human"
@@ -21,15 +23,15 @@ class MainMenu:
 
 
         # Human Vs Human Button
-        humanHumanButton = Button(main, text="Human VS Human", width=25,command=lambda: self.selectMode("Human_Human"))
+        humanHumanButton = Button(main, text="Human VS Human", width=25,command=lambda: self.selectMode("Human_Human",main))
         my_canvas.create_window(400, 400, window=humanHumanButton)
 
         # Human Vs AI Button
-        humanAIButton = Button(main, text="Human VS AI", width=25,command=lambda:self.selectMode("Human_AI"))
+        humanAIButton = Button(main, text="Human VS AI", width=25,command=lambda:self.selectMode("Human_AI",main))
         my_canvas.create_window(400, 450, window=humanAIButton)
 
         # Computer VS AI Button
-        computerAIButton = Button(main, text="Computer VS AI", width=25,command=lambda:self.selectMode("Computer_AI"))
+        computerAIButton = Button(main, text="Computer VS AI", width=25,command=lambda:self.selectMode("Computer_AI",main))
         my_canvas.create_window(400, 500, window=computerAIButton)
 
         # Exit Button
@@ -41,6 +43,9 @@ class MainMenu:
 
 
 
-    def selectMode(self,newMode):
+    def selectMode(self,newMode,main):
         mode=newMode
-        print(mode)
+        main.withdraw()
+        BoardGUI(mode)
+
+
