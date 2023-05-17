@@ -205,6 +205,59 @@ class BoardGUI:
                             self.turn = 2
                         else:
                             self.turn = 1
+            elif self.mode=='Human_AI':
+                for event in pygame.event.get():
+
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                    if event.type == pygame.MOUSEMOTION:
+                        pygame.draw.rect(screen, WHITE, (0, 0, width, self.square_size))
+                        posx = event.pos[0]
+                        if self.turn == 1:
+                            pygame.draw.circle(screen, RED, (posx, int(self.square_size / 2)), radius)
+                            label = myfontPiece.render(self.player1, 1, WHITE)
+                            screen.blit(label, label.get_rect(center=(posx, int(self.square_size / 2))))
+
+                    pygame.display.update()
+
+
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        # Ask for Player 1 Input
+                        if self.turn == 1:
+                            pygame.draw.rect(screen, WHITE, (0, 0, width, self.square_size))
+                            posx = event.pos[0]
+                            col = int(math.floor(posx / self.square_size))
+
+                            if self.is_valid_location(self.board, col):
+                                row = self.get_next_open_row(self.board, col)
+                                self.drop_piece(self.board, row, col, 1)
+
+                                if self.winning_move(self.board, 1):
+                                    label = myfont.render("Player 1 wins!!", 1, RED)
+                                    screen.blit(label, (40, 10))
+                                    self.game_end = True
+
+                        # # Ask for Player 2 Input
+                        else:
+                            col ,_= AIAgent.Alpha_Beta_Pruning(self.board,self.board_Width,self.board_Height,6,-math.inf, math.inf, True)#2for easy,4for medium,6 for hard
+                            #col, _ = AIAgent.Minimax(self.board, self.board_Width, self.board_Height, 6, True)#2for easy,4for medium,6 for hard
+                            if self.is_valid_location(self.board, col):
+                                row = self.get_next_open_row(self.board, col)
+                                self.drop_piece(self.board, row, col, 2)
+
+                                if self.winning_move(self.board, 2):
+                                    label = myfont.render("Player 2 wins!!", 1, BLUE)
+                                    screen.blit(label, (40, 10))
+                                    self.game_end = True
+
+                        self.draw_board(self.board, screen, radius, height, myfontPiece)
+
+                        if self.turn == 1:
+                            self.turn = 2
+                        else:
+                            self.turn = 1
 
             elif self.mode=="Computer_AI":
 
@@ -221,7 +274,8 @@ class BoardGUI:
                             self.game_end = True
                 else:
 
-                    col ,_= AIAgent.Alpha_Beta_Pruning(self.board,self.board_Width,self.board_Height,6,-math.inf, math.inf, True)# 2 for easy, 4 for medieum, 6 for hard
+                    col ,_= AIAgent.Alpha_Beta_Pruning(self.board,self.board_Width,self.board_Height,4,-math.inf, math.inf, True)#2for easy,4for medium,6 for hard
+                    #col, _ = AIAgent.Minimax(self.board, self.board_Width, self.board_Height, 6, True)#2for easy,4for medium,6 for hard
                     if self.is_valid_location(self.board, col):
                         row = self.get_next_open_row(self.board, col)
                         self.drop_piece(self.board, row, col, 2)
@@ -240,16 +294,8 @@ class BoardGUI:
 
                 time.sleep(1)
 
-
-
-
-
-
-
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-
-
