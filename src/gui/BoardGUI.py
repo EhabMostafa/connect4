@@ -24,7 +24,8 @@ class BoardGUI:
     player1 = "H1"
     player2 = "H2"
     mode = "Human_Human"
-    level = "easy"
+    level = 2
+    algo = 1
 
     def makeBoard(self):
         self.board = []
@@ -118,10 +119,14 @@ class BoardGUI:
                         board[r - 3][c + 3] == piece:
                     return True
 
-    def __init__(self, mode):
+    def __init__(self, mode,level,algo):
 
         self.makeBoard()
         self.selectMode(mode)
+        self.level=level
+        self.algo=algo
+
+        print(self.level,self.algo)
 
         # Lets implement GUI
         pygame.init()
@@ -188,6 +193,11 @@ class BoardGUI:
                                     screen.blit(label, (40, 10))
                                     self.game_end = True
 
+                                if self.turn == 1:
+                                    self.turn = 2
+                                else:
+                                    self.turn = 1
+
                         # # Ask for Player 2 Input
                         else:
                             posx = event.pos[0]
@@ -203,38 +213,50 @@ class BoardGUI:
                                     screen.blit(label, (40, 10))
                                     self.game_end = True
 
+                                if self.turn == 1:
+                                    self.turn = 2
+                                else:
+                                    self.turn = 1
+
                         self.draw_board(self.board, screen,
                                         radius, height, myfontPiece)
 
-                        if self.turn == 1:
-                            self.turn = 2
-                        else:
-                            self.turn = 1
-            elif self.mode == 'Human_AI':
-                for event in pygame.event.get():
 
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
 
-                    if event.type == pygame.MOUSEMOTION:
-                        pygame.draw.rect(
-                            screen, WHITE, (0, 0, width, self.square_size))
-                        posx = event.pos[0]
-                        if self.turn == 1:
-                            pygame.draw.circle(
-                                screen, RED, (posx, int(self.square_size / 2)), radius)
-                            label = myfontPiece.render(self.player1, 1, WHITE)
-                            screen.blit(label, label.get_rect(
-                                center=(posx, int(self.square_size / 2))))
 
-                    pygame.display.update()
+            elif self.mode == "Human_AI":
 
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        # Ask for Player 1 Input
-                        if self.turn == 1:
+
+                if self.turn == 1:
+
+                    for event in pygame.event.get():
+
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            sys.exit()
+
+                        if event.type == pygame.MOUSEMOTION:
                             pygame.draw.rect(
                                 screen, WHITE, (0, 0, width, self.square_size))
+                            posx = event.pos[0]
+                            if self.turn == 1:
+                                pygame.draw.circle(
+                                    screen, RED, (posx, int(self.square_size / 2)), radius)
+                                label = myfontPiece.render(self.player1, 1, WHITE)
+                                screen.blit(label, label.get_rect(
+                                    center=(posx, int(self.square_size / 2))))
+                            else:
+                                pygame.draw.circle(
+                                    screen, BLUE, (posx, int(self.square_size / 2)), radius)
+                                label = myfontPiece.render(self.player2, 1, WHITE)
+                                screen.blit(label, label.get_rect(
+                                    center=(posx, int(self.square_size / 2))))
+                        pygame.display.update()
+
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            pygame.draw.rect(
+                                screen, WHITE, (0, 0, width, self.square_size))
+
                             posx = event.pos[0]
                             col = int(math.floor(posx / self.square_size))
 
@@ -243,39 +265,59 @@ class BoardGUI:
                                 self.drop_piece(self.board, row, col, 1)
 
                                 if self.winning_move(self.board, 1):
-                                    label = myfont.render(
-                                        "Player 1 wins!!", 1, RED)
+                                    label = myfont.render("Player 1 wins!!", 1, RED)
                                     screen.blit(label, (40, 10))
                                     self.game_end = True
 
-                        # # Ask for Player 2 Input
-                        else:
-                            # 2for easy,4for medium,6 for hard
-                            col, _ = AIAgent.Alpha_Beta_Pruning(
-                                self.board, self.board_Width, self.board_Height, 6, -math.inf, math.inf, True)
-                            # col, _ = AIAgent.Minimax(self.board, self.board_Width, self.board_Height, 6, True)#2for easy,4for medium,6 for hard
-                            if self.is_valid_location(self.board, col):
-                                row = self.get_next_open_row(self.board, col)
-                                self.drop_piece(self.board, row, col, 2)
+                                if self.turn == 1:
+                                    self.turn = 2
+                                else:
+                                    self.turn = 1
 
-                                if self.winning_move(self.board, 2):
-                                    label = myfont.render(
-                                        "Player 2 wins!!", 1, BLUE)
-                                    screen.blit(label, (40, 10))
-                                    self.game_end = True
+                else:
 
-                        self.draw_board(self.board, screen,
-                                        radius, height, myfontPiece)
+                    # 2 for easy, 4 for medium, 6 for hard
+
+                    if self.algo == 1:
+
+                        col, _ = AIAgent.Alpha_Beta_Pruning(self.board, self.board_Width, self.board_Height, self.level,
+                                                            -math.inf, math.inf, True)
+
+                    else:
+
+                        col, _ = AIAgent.Minimax(self.board, self.board_Width, self.board_Height, self.level, True)
+
+                    if self.is_valid_location(self.board, col):
+
+                        row = self.get_next_open_row(self.board, col)
+
+                        self.drop_piece(self.board, row, col, 2)
+
+                        if self.winning_move(self.board, 2):
+                            label = myfont.render("Player 2 wins!!", 1, BLUE)
+
+                            screen.blit(label, (40, 10))
+
+                            self.game_end = True
 
                         if self.turn == 1:
                             self.turn = 2
                         else:
                             self.turn = 1
 
+                self.draw_board(self.board, screen, radius,height, myfontPiece)
+
+
+
+
             elif self.mode == "Computer_AI":
 
                 if self.turn == 1:
+
                     col = random.randint(0, self.board_Height-1)
+
+                    time.sleep(1)
+
 
                     if self.is_valid_location(self.board, col):
                         row = self.get_next_open_row(self.board, col)
@@ -285,12 +327,20 @@ class BoardGUI:
                             label = myfont.render("Player 1 wins!!", 1, RED)
                             screen.blit(label, (40, 10))
                             self.game_end = True
+
+                        if self.turn == 1:
+                            self.turn = 2
+                        else:
+                            self.turn = 1
                 else:
 
-                    # 2for easy,4for medium,6 for hard
-                    col, _ = AIAgent.Alpha_Beta_Pruning(
-                        self.board, self.board_Width, self.board_Height, 4, -math.inf, math.inf, True)
-                    # col, _ = AIAgent.Minimax(self.board, self.board_Width, self.board_Height, 6, True)#2for easy,4for medium,6 for hard
+                    # 2 for easy, 4 for medium, 6 for hard
+                    if self.algo == 1:
+                        col, _ = AIAgent.Alpha_Beta_Pruning(self.board, self.board_Width, self.board_Height, self.level, -math.inf, math.inf, True)
+                    else:
+                        col, _ = AIAgent.Minimax(self.board, self.board_Width, self.board_Height, self.level, True)
+
+
                     if self.is_valid_location(self.board, col):
                         row = self.get_next_open_row(self.board, col)
                         self.drop_piece(self.board, row, col, 2)
@@ -300,15 +350,16 @@ class BoardGUI:
                             screen.blit(label, (40, 10))
                             self.game_end = True
 
+                        if self.turn == 1:
+                            self.turn = 2
+                        else:
+                            self.turn = 1
+
                 self.draw_board(self.board, screen, radius,
                                 height, myfontPiece)
 
-                if self.turn == 1:
-                    self.turn = 2
-                else:
-                    self.turn = 1
 
-                time.sleep(1)
+
 
         while True:
             for event in pygame.event.get():
