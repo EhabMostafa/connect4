@@ -3,6 +3,7 @@ from tkinter import *
 from PIL import ImageTk, Image
 import os.path
 from src.gui.BoardGUI import BoardGUI
+from src.gui.PopUp import *
 
 class MainMenu:
     mode="Human_Human"
@@ -34,6 +35,11 @@ class MainMenu:
         computerAIButton = Button(main, text="Computer VS AI", width=25,command=lambda:self.selectMode("Computer_AI",main))
         my_canvas.create_window(400, 500, window=computerAIButton)
 
+        # AI VS Any Button
+        AIAnyButton = Button(main, text="AI VS Any", width=25,
+                                  command=lambda: self.selectMode("AI_ANY", main))
+        my_canvas.create_window(400, 550, window=AIAnyButton)
+
         # Exit Button
         exitButton = Button(main, text="Exit", width=25,command=main.destroy)
         my_canvas.create_window(400, 750, window=exitButton)
@@ -44,8 +50,11 @@ class MainMenu:
 
 
     def selectMode(self,newMode,main):
-        mode=newMode
-        main.withdraw()
-        BoardGUI(mode)
+        self.mode=newMode
+        if newMode != "Human_Human":
+            show_popup(main,newMode)
+        else:
+            main.withdraw()
+            BoardGUI(self.mode,-1,-1)
 
 
