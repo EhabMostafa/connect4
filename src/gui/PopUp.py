@@ -3,6 +3,7 @@ from src.gui.BoardGUI import BoardGUI
 from tkinter import messagebox
 from PIL import ImageTk, Image
 import os.path
+from src.script.game import ai_script
 
 def show_popup(prev_main,mode):
     level=IntVar(value=2)
@@ -17,7 +18,7 @@ def show_popup(prev_main,mode):
         main.withdraw()
         prev_main.withdraw()
         if mode== "AI_ANY":
-            messagebox.showinfo(title="For Rana", message="Put ur implement here")
+            ai_script(mode,selected_option_level,selected_option_algo)
         else:
             BoardGUI(mode,selected_option_level,selected_option_algo)
 
