@@ -15,8 +15,8 @@ YELLOW = (255, 255, 0)
 
 class BoardGUI:
 
-    board_Width = 6
-    board_Height = 7
+    board_Width = 6         #Mean number of rows
+    board_Height = 7        #Mean number of Cols
     square_size = 100
     board = []
     turn = 1
@@ -125,8 +125,6 @@ class BoardGUI:
         self.selectMode(mode)
         self.level=level
         self.algo=algo
-
-        print(self.level,self.algo)
 
         # Lets implement GUI
         pygame.init()
@@ -279,7 +277,6 @@ class BoardGUI:
                     # 2 for easy, 4 for medium, 6 for hard
 
                     if self.algo == 1:
-
                         col, _ = AIAgent.Alpha_Beta_Pruning(self.board, self.board_Width, self.board_Height, self.level,
                                                             -math.inf, math.inf, True)
 
